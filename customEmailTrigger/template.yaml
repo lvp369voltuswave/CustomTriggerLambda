@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+
+  customMessageTrigger:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/
+      Handler: custom-message-trigger.lambdaHandler
+      Runtime: nodejs18.x
+      MemorySize: 2048
+      FunctionName: custom-message-trigger-fn
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+              Resource: "*"
+
+  smsCustomMessageTrigger:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/
+      Handler: sms-custom-message-trigger.lambdaHandler
+      Runtime: nodejs18.x
+      MemorySize: 2048
+      FunctionName: sms-custom-message-trigger-fn
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+              Resource: "*"    
+
+  
+Outputs:
+  CreateAuthChallenge:
+    Description: The ID of the customMessageTrigger
+    Value: !GetAtt customMessageTrigger.Arn
+
+  
+
