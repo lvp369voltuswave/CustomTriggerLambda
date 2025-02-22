@@ -1,0 +1,27 @@
+{
+    "version": "1",
+    "triggerSource": "CustomSMSSender_SignUp",
+    "region": "ap-south-1",
+    "userPoolId": "ap-south-1_xPLBoPHNV",
+    "userName": "lvprasad_852",
+    "callerContext": {
+      "awsSdkVersion": "aws-sdk-unknown-unknown",
+      "clientId": "1u36th8q5rhd8hve1eajeceo15"
+    },
+    "request": {
+      "type": "customSMSSenderRequestV1",
+      "code": "AYADeAu3Go8jOTY86gPY83Cq+y8AggACABVhd3MtY3J5cHRvLXB1YmxpYy1rZXkAREFvcmUwLzVnT2FZRW5wMmRzTUlOZFJaRE1vaDE2SFF4YWhvcFBPQnVpNFZYM3ptc1N1RWVkWDRtbStydWhYZXVYZz09AAt1c2VycG9vbC1pZAAUYXAtc291dGgtMV94UExCb1BITlYAAQAHYXdzLWttcwBMYXJuOmF3czprbXM6YXAtc291dGgtMTo5ODEyNDQ4Mjk3NzU6a2V5L2I3ZTEwYWJiLWFlNjgtNDM0Mi05MDk5LTMwYzkzZTRhNDNmNwC4AQIBAHiZOU0Op/eNNj+rBSqA9bcaguLKxAD0/TMvgi6jiwMMXAE+f/8lw/5kIAecH0bUdSwFAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMDHIuJe+K7837EZPbAgEQgDvJ2Ui5KTAo/hcxDJhFqrDLzwMPaIkK6PQ9DNMyaTjqpN4o92PQCvueK1zquNGJbmwKDhaPrKlAuBL7uAIAAAAADAAAEAAAAAAAAAAAAAAAAAAvxJQj12O90FeH9rfKmjVe/////wAAAAEAAAAAAAAAAAAAAAEAAAAGlXWIg89fG6GOP6WCqBBScU8/w0UXugBnMGUCMQD4eUtBoEytsM2oBYS6NFBU8Yknv86Ca43vsHn3KP+RQzhj/e8NekRoWf+x8Nkuh+sCMELKoAr1AwRgnxyrCJIVWDKPH8c1UBosXquSIG3fLtS3ItHijuVXZzUv6HBhmdZtPA==",
+      "clientMetadata": null,
+      "userAttributes": {
+        "sub": "21430d3a-3041-70e6-5578-a1ac110b1aab",
+        "email_verified": "false",
+        "cognito:user_status": "UNCONFIRMED",
+        "name": "LVP",
+        "phone_number_verified": "false",
+        "phone_number": "+919896332965",
+        "given_name": "lvprasad",
+        "family_name": "the",
+        "email": "varaprasad.t@voltuswave.com"
+      }
+    }
+  }

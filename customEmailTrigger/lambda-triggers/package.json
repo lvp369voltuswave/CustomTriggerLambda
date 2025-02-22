@@ -10,7 +10,8 @@
     "@aws-crypto/client-node": "^4.0.2",
     "aws-sdk": "^2.1692.0",
     "axios": ">=0.21.1",
-    "base64-js": "^1.5.1"
+    "base64-js": "^1.5.1",
+    "nodemailer": "^6.10.0"
   },
   "scripts": {
     "test": "mocha tests/unit/"

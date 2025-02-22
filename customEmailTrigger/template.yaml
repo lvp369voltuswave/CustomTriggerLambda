@@ -15,14 +15,22 @@ Resources:
       Runtime: nodejs18.x
       MemorySize: 2048
       FunctionName: custom-message-trigger-fn
+      Environment:
+        Variables:
+          SMTP_SERVER: "email-smtp.ap-south-1.amazonaws.com" # SES SMTP endpoint for your region
+          SMTP_PORT: "587" # Choose between 587 (TLS) or 465 (SSL)
+          SMTP_USERNAME:  'AKIA6I5V74BH4FVKMWXG' # Stored securely
+          SMTP_PASSWORD: 'BOTJJKasYVBEn7TRm5BAzwTLtSOS7JA2QJ/pSUAmVgNA' # Stored securely
+          EMAIL_FROM: "no-reply@amura.ai" # Replace with a verified SES email
       Policies:
         - Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Action:
                 - kms:Decrypt
+                - ssm:GetParameter
               Resource: "*"
-
+  
   smsCustomMessageTrigger:
     Type: AWS::Serverless::Function
     Properties:
@@ -37,13 +45,127 @@ Resources:
             - Effect: Allow
               Action:
                 - kms:Decrypt
-              Resource: "*"    
+                - ssm:GetParameter
+              Resource: "*"
 
+  amuraHealthSignup:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/
+      Handler: amuraHealthSignup.lambdaHandler
+      Runtime: nodejs18.x
+      MemorySize: 2048
+      FunctionName: amuraHealthSignup
+      Environment:
+        Variables:
+          REGION: "ap-south-1"
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - ssm:GetParameter
+                - cognito-idp:SignUp
+              Resource: "*"
+  ConfirmationSignup:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/
+      Handler: ConfirmationSignup.lambdaHandler
+      Runtime: nodejs18.x
+      MemorySize: 2048
+      FunctionName: ConfirmationSignup
+      Environment:
+        Variables:
+          REGION: "ap-south-1"
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - ssm:GetParameter
+                - cognito-idp:SignUp
+              Resource: "*"
+  verifySignup:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/
+      Handler: verifySignup.lambdaHandler
+      Runtime: nodejs18.x
+      MemorySize: 2048
+      FunctionName: verifySignup
+      Environment:
+        Variables:
+          REGION: "ap-south-1"
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - ssm:GetParameter
+                - cognito-idp:SignUp
+              Resource: "*"  
+  CreatePassword:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/
+      Handler: CreatePassword.lambdaHandler
+      Runtime: nodejs18.x
+      MemorySize: 2048
+      FunctionName: CreatePassword
+      Environment:
+        Variables:
+          REGION: "ap-south-1"
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - ssm:GetParameter
+                - cognito-idp:SignUp
+              Resource: "*"
+  ResendConfirmationCodeRequest:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/
+      Handler: ResendConfirmationCodeRequest.lambdaHandler
+      Runtime: nodejs18.x
+      MemorySize: 2048
+      FunctionName: ResendConfirmationCodeRequest
+      Environment:
+        Variables:
+          REGION: "ap-south-1"
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - ssm:GetParameter
+                - cognito-idp:SignUp
+              Resource: "*"
   
 Outputs:
   CreateAuthChallenge:
     Description: The ID of the customMessageTrigger
     Value: !GetAtt customMessageTrigger.Arn
 
-  
+  customMessageTriggerUrl:
+    Description: URL for the customMessageTrigger Lambda function
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/lambda/home?region=${AWS::Region}#/functions/custom-message-trigger-fn"
 
+  smsCustomMessageTriggerUrl:
+    Description: URL for the smsCustomMessageTrigger Lambda function
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/lambda/home?region=${AWS::Region}#/functions/sms-custom-message-trigger-fn"
+
+  amuraHealthSignupUrl:
+    Description: URL for the amuraHealthSignup Lambda function
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/lambda/home?region=${AWS::Region}#/functions/amuraHealthSignup"
+
+  ConfirmationSignupUrl:
+    Description: URL for the ConfirmationSignup Lambda function
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/lambda/home?region=${AWS::Region}#/functions/ConfirmationSignup"
