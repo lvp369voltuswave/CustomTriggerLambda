@@ -3,33 +3,41 @@ Transform: AWS::Serverless-2016-10-31
 
 Globals:
   Function:
-    Timeout: 30
+    Tracing: Active
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'content-type'"
+      AllowOrigin: "'*'"
+      AllowCredentials: "'*'"
+    TracingEnabled: True
+     
 
 Resources:
 
-  customMessageTrigger:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: lambda-triggers/
-      Handler: custom-message-trigger.lambdaHandler
-      Runtime: nodejs18.x
-      MemorySize: 2048
-      FunctionName: custom-message-trigger-fn
-      Environment:
-        Variables:
-          SMTP_SERVER: "email-smtp.ap-south-1.amazonaws.com" # SES SMTP endpoint for your region
-          SMTP_PORT: "587" # Choose between 587 (TLS) or 465 (SSL)
-          SMTP_USERNAME:  'AKIA6I5V74BH4FVKMWXG' # Stored securely
-          SMTP_PASSWORD: 'BOTJJKasYVBEn7TRm5BAzwTLtSOS7JA2QJ/pSUAmVgNA' # Stored securely
-          EMAIL_FROM: "no-reply@amura.ai" # Replace with a verified SES email
-      Policies:
-        - Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Action:
-                - kms:Decrypt
-                - ssm:GetParameter
-              Resource: "*"
+  # customMessageTrigger:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: lambda-triggers/
+  #     Handler: custom-message-trigger.lambdaHandler
+  #     Runtime: nodejs18.x
+  #     MemorySize: 2048
+  #     FunctionName: custom-message-trigger-fn
+  #     Environment:
+  #       Variables:
+  #         SMTP_SERVER: "email-smtp.ap-south-1.amazonaws.com" # SES SMTP endpoint for your region
+  #         SMTP_PORT: "587" # Choose between 587 (TLS) or 465 (SSL)
+  #         SMTP_USERNAME:  'AKIA6I5V74BH4FVKMWXG' # Stored securely
+  #         SMTP_PASSWORD: 'BOTJJKasYVBEn7TRm5BAzwTLtSOS7JA2QJ/pSUAmVgNA' # Stored securely
+  #         EMAIL_FROM: "no-reply@amura.ai" # Replace with a verified SES email
+  #     Policies:
+  #       - Version: "2012-10-17"
+  #         Statement:
+  #           - Effect: Allow
+  #             Action:
+  #               - kms:Decrypt
+  #               - ssm:GetParameter
+  #             Resource: "*"
   
   smsCustomMessageTrigger:
     Type: AWS::Serverless::Function
@@ -68,6 +76,14 @@ Resources:
                 - ssm:GetParameter
                 - cognito-idp:SignUp
               Resource: "*"
+      Events:
+        amuraHealthSignup:
+          Type: Api
+          Properties:
+            Path: /amuraHealthSignup
+            Method: post
+            
+  
   ConfirmationSignup:
     Type: AWS::Serverless::Function
     Properties:
@@ -88,6 +104,12 @@ Resources:
                 - ssm:GetParameter
                 - cognito-idp:SignUp
               Resource: "*"
+      Events:
+        ConfirmationSignup:
+          Type: Api
+          Properties:
+            Path: /ConfirmationSignup
+            Method: post
   verifySignup:
     Type: AWS::Serverless::Function
     Properties:
@@ -107,7 +129,13 @@ Resources:
                 - kms:Decrypt
                 - ssm:GetParameter
                 - cognito-idp:SignUp
-              Resource: "*"  
+              Resource: "*"
+      Events:
+        verifySignup:
+          Type: Api
+          Properties:
+            Path: /verifySignup
+            Method: post  
   CreatePassword:
     Type: AWS::Serverless::Function
     Properties:
@@ -128,11 +156,45 @@ Resources:
                 - ssm:GetParameter
                 - cognito-idp:SignUp
               Resource: "*"
+      Events:
+        CreatePassword:
+          Type: Api
+          Properties:
+            Path: /CreatePassword
+            Method: post
+  
+  CreateUsername:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda-triggers/
+      Handler: CreateUsername.lambdaHandler
+      Runtime: nodejs18.x
+      MemorySize: 2048
+      FunctionName: CreateUsername
+      Environment:
+        Variables:
+          REGION: "ap-south-1"
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - kms:Decrypt
+                - ssm:GetParameter
+                - cognito-idp:SignUp
+              Resource: "*"
+      Events:
+        CreateUsername:
+          Type: Api
+          Properties:
+            Path: /CreateUsername
+            Method: post
+
   ResendConfirmationCodeRequest:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: lambda-triggers/
-      Handler: ResendConfirmationCodeRequest.lambdaHandler
+      Handler: ResendConfirmationCodeRequest.resendOtp
       Runtime: nodejs18.x
       MemorySize: 2048
       FunctionName: ResendConfirmationCodeRequest
@@ -148,24 +210,34 @@ Resources:
                 - ssm:GetParameter
                 - cognito-idp:SignUp
               Resource: "*"
+      Events:
+        ResendConfirmationCodeRequest:
+          Type: Api
+          Properties:
+            Path: /ResendConfirmationCodeRequest
+            Method: post
+     
   
 Outputs:
   CreateAuthChallenge:
-    Description: The ID of the customMessageTrigger
-    Value: !GetAtt customMessageTrigger.Arn
-
-  customMessageTriggerUrl:
-    Description: URL for the customMessageTrigger Lambda function
-    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/lambda/home?region=${AWS::Region}#/functions/custom-message-trigger-fn"
-
-  smsCustomMessageTriggerUrl:
-    Description: URL for the smsCustomMessageTrigger Lambda function
-    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/lambda/home?region=${AWS::Region}#/functions/sms-custom-message-trigger-fn"
+    Description: The ID of the smsCustomMessageTrigger
+    Value: !GetAtt smsCustomMessageTrigger.Arn
 
   amuraHealthSignupUrl:
     Description: URL for the amuraHealthSignup Lambda function
-    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/lambda/home?region=${AWS::Region}#/functions/amuraHealthSignup"
-
-  ConfirmationSignupUrl:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/amuraHealthSignup"
+  ConfirmationSignup:
     Description: URL for the ConfirmationSignup Lambda function
-    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/lambda/home?region=${AWS::Region}#/functions/ConfirmationSignup"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ConfirmationSignup"
+  verifySignup:
+    Description: URL for the verifySignup Lambda function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/verifySignup"
+  ResendConfirmationCodeRequest:
+    Description: URL for the ResendConfirmationCodeRequest Lambda function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ResendConfirmationCodeRequest"
+  CreatePassword: 
+    Description: URL for the CreatePassword Lambda function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/CreatePassword"
+  CreateUsername: 
+    Description: URL for the CreateUsername Lambda function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/CreateUsername"

@@ -23,9 +23,12 @@ exports.lambdaHandler = async (event) => {
                 { Name: "given_name", Value: firstName },
                 { Name: "family_name", Value: lastName },
                 { Name: "custom:Password", Value: password },
-                { Name: "custom:isPasswordChanged", Value: "false" }
+                { Name: "custom:isPasswordChanged", Value: "false" },
+                { Name: "custom:isUserName", Value: "false" }
+
             ]
         });
+        console.log('command========++++>', command)
 
 
         const response = await client.send(command);
